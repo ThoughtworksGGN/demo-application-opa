@@ -1,0 +1,24 @@
+{
+  "notifications": [
+    {
+      "notificationid": "08718203-E617-4DA5-85DE-831501D6CE84",
+      "accountid": "9B8FF595-9E32-41CA-8CF1-068CAC73A0B0",
+      "info": "Notification1 for User1"
+    },
+    {
+      "notificationid": "CBD1B44D-27A3-4713-9B86-558CB1100AF0",
+      "accountid": "9B8FF595-9E32-41CA-8CF1-068CAC73A0B0",
+      "info": "Notification2 for User1"
+    },
+    {
+      "notificationid": "C811051B-3108-4C5D-9BB9-F3830C008CB5",
+      "accountid": "FAB1D671-2402-4CB1-B295-ECF00D4C4065",
+      "info": "Notification1 for User2"
+    },
+    {
+      "notificationid": "C4DFE41E-9F17-4DBB-96C3-4CB50B3E948E",
+      "accountid": "FAB1D671-2402-4CB1-B295-ECF00D4C4065",
+      "info": "Notification2 for User2"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "users": [
+    {
+      "userid": "2F6AEE39-AA31-421F-9396-4D7066BBBB74",
+      "name": "user1",
+      "password": "password1",
+      "role": "CUSTOMER"
+    },
+    {
+      "userid": "C140BE51-C381-47BC-8452-7C2F7E49E4DE",
+      "name": "user2",
+      "password": "password2",
+      "role": "CUSTOMER"
+    },
+    {
+      "userid": "423C3C1E-3188-4471-BADA-C0EF06DD6419",
+      "name": "support1",
+      "password": "password3",
+      "role": "SUPPORT"
+    },
+    {
+      "userid": "6A22DAF5-E012-402A-B61F-9C84CB5BE0D1",
+      "name": "support2",
+      "password": "password4",
+      "role": "SUPPORT"
+    }
+  ]
+}

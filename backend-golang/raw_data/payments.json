@@ -1,0 +1,24 @@
+{
+  "payments": [
+    {
+      "paymentid": "85BBDE19-1409-4A10-94F3-A7F79874304E",
+      "accountid": "9B8FF595-9E32-41CA-8CF1-068CAC73A0B0",
+      "amount": 100
+    },
+    {
+      "paymentid": "563E8CD0-9F35-47D3-9F38-4980FCDF9583",
+      "accountid": "FAB1D671-2402-4CB1-B295-ECF00D4C4065",
+      "amount": 100
+    },
+    {
+      "paymentid": "2AD8904F-566E-4872-BDB8-8783F14910D3",
+      "accountid": "9B8FF595-9E32-41CA-8CF1-068CAC73A0B0",
+      "amount": 100
+    },
+    {
+      "paymentid": "1D42A614-8F06-4F06-88EC-589D4A8D3118",
+      "accountid": "9B8FF595-9E32-41CA-8CF1-068CAC73A0B0",
+      "amount": 100
+    }
+  ]
+}
