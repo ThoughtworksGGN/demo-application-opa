@@ -3,6 +3,7 @@ package api
 import (
 	"demo-application-opa-golang/data"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/emicklei/go-restful/v3"
 	"time"
 )
 
@@ -28,4 +29,17 @@ func createToken(user data.User) (string,error) {
 
 	return authToken, nil
 
+}
+
+func(api api) authFilter() restful.FilterFunction {
+	return func(request *restful.Request, response *restful.Response, chain *restful.FilterChain) {
+		store := api.Store
+		authToken := request.Request.Header.Get("authorization")
+
+		if authToken != ""  && store.SessionExists(authToken) {
+			chain.ProcessFilter(request, response)
+		} else {
+			_ = response.WriteErrorString(401, "New Service Who Dis?")
+		}
+	}
 }

@@ -39,6 +39,20 @@ func (s *Store) FindUserByName(name string) (User, error) {
 	return matchingUser, &UserNotFoundError{}
 }
 
+func(s *Store) SessionExists(token string) bool {
+	sessionExists := false
+	sessions := s.Sessions
+
+	for _, session := range sessions {
+		if token == session {
+			sessionExists = true
+			break
+		}
+	}
+
+	return sessionExists
+}
+
 func (e UserNotFoundError) Error() string {
 	return "User Not found"
 }

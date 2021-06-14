@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"demo-application-opa-golang/data"
 	"encoding/json"
 	"fmt"
@@ -15,7 +16,7 @@ type api struct {
 
 type loginRequest struct {
 	Name     string `json:"name"`
-	Password string  `json:"password"`
+	Password string `json:"password"`
 }
 
 type loginResponse struct {
@@ -27,7 +28,8 @@ func InitialiseWebService(store *data.Store) http.Handler {
 	api := api{Store: store}
 	restfulContainer := restful.NewContainer()
 
-	ws.Route(ws.GET("/hello").To(api.hello))
+	ws.Filter(api.populateDataStoreInContext())
+	ws.Route(ws.GET("/hello").Filter(api.authFilter()).To(api.hello))
 	ws.Route(ws.POST("/login").To(api.login).Consumes(restful.MIME_JSON).Produces(restful.MIME_JSON))
 	ws.Route(ws.DELETE("/logout").To(api.logout).Consumes(restful.MIME_JSON).Produces(restful.MIME_JSON))
 
@@ -36,14 +38,15 @@ func InitialiseWebService(store *data.Store) http.Handler {
 	return restfulContainer.ServeMux
 }
 
-func (api api) hello(_ *restful.Request, resp *restful.Response) {
-	_ = resp.WriteAsJson(api.Store)
+func (api api) hello(req *restful.Request, resp *restful.Response) {
+	ctx := req.Request.Context()
+	_ = resp.WriteAsJson(ctx.Value("store"))
 }
 
 func (api api) login(req *restful.Request, resp *restful.Response) {
-	bytes,err := io.ReadAll(req.Request.Body)
+	bytes, err := io.ReadAll(req.Request.Body)
 	if err != nil {
-		fmt.Println( err.Error())
+		fmt.Println(err.Error())
 		_ = resp.WriteHeaderAndEntity(400, "Invalid Request")
 	}
 	loginRequestBody := loginRequest{}
@@ -51,7 +54,7 @@ func (api api) login(req *restful.Request, resp *restful.Response) {
 
 	err = json.Unmarshal(bytes, &loginRequestBody)
 
-	if err !=nil {
+	if err != nil {
 		_ = resp.WriteHeaderAndEntity(400, "Invalid Request")
 	}
 
@@ -72,8 +75,6 @@ func (api api) login(req *restful.Request, resp *restful.Response) {
 		_ = resp.WriteHeaderAndEntity(400, "Invalid Username or Password")
 	}
 
-
-
 }
 
 func (api api) logout(req *restful.Request, resp *restful.Response) {
@@ -88,9 +89,18 @@ func (api api) logout(req *restful.Request, resp *restful.Response) {
 
 	if sessionToDelete >= 0 {
 		sessions := api.Store.Sessions
-		sessions[sessionToDelete] = sessions[len(sessions) -1]
-		api.Store.Sessions = sessions[:len(sessions) -1]
+		sessions[sessionToDelete] = sessions[len(sessions)-1]
+		api.Store.Sessions = sessions[:len(sessions)-1]
 	}
 
 	resp.WriteHeader(http.StatusOK)
+}
+
+func (api api) populateDataStoreInContext() restful.FilterFunction {
+	return func(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {
+		r := req.Request
+		ctx := context.WithValue(r.Context(), "store", api.Store)
+		req.Request = r.WithContext(ctx)
+		chain.ProcessFilter(req, resp)
+	}
 }
