@@ -35,6 +35,10 @@ type accountResponse struct {
 	Tickets       *[]data.Ticket       `json:"tickets"`
 }
 
+type accountForUserIdResponse struct {
+	AccountId uuid.UUID `json:"account_id"`
+}
+
 func InitialiseWebService(store *data.Store) http.Handler {
 	ws := new(restful.WebService)
 	api := api{Store: store}
@@ -45,7 +49,8 @@ func InitialiseWebService(store *data.Store) http.Handler {
 	ws.Route(ws.POST("/login").To(api.login).Consumes(restful.MIME_JSON).Produces(restful.MIME_JSON))
 	ws.Route(ws.DELETE("/logout").To(api.logout).Consumes(restful.MIME_JSON).Produces(restful.MIME_JSON))
 	ws.Route(ws.GET("/tickets").Filter(api.authFilter()).To(api.getTickets).Consumes(restful.MIME_JSON).Produces(restful.MIME_JSON))
-	ws.Route(ws.GET("/account/{accountId}").Filter(api.authFilter()).To(api.getAccount).Consumes(restful.MIME_JSON).Produces(restful.MIME_JSON))
+	ws.Route(ws.GET("/accounts/{accountId}").Filter(api.authFilter()).To(api.getAccount).Consumes(restful.MIME_JSON).Produces(restful.MIME_JSON))
+	ws.Route(ws.GET("/account").Filter(api.authFilter()).To(api.getAccountForUser).Consumes(restful.MIME_JSON).Produces(restful.MIME_JSON))
 
 	restfulContainer.Add(ws)
 
@@ -144,6 +149,32 @@ func (api api) getAccount(request *restful.Request, response *restful.Response) 
 			Tickets:       &tickets,
 		}
 
+		_ = response.WriteAsJson(responseForAccount)
+	} else {
+		_ = response.WriteErrorString(404, "Could not find matching account")
+	}
+
+}
+
+func (api api) getAccountForUser(request *restful.Request, response *restful.Response) {
+	sessionId := request.Request.Header.Get("authorization")
+	user := api.Store.Sessions[sessionId]
+	accounts := api.Store.Accounts
+
+	var matchingAccounts []data.Account
+
+	for _, account := range accounts {
+		if account.UserId == user.UserId {
+			matchingAccounts = append(matchingAccounts, account)
+			break
+		}
+	}
+
+	if len(matchingAccounts) == 1 {
+
+		responseForAccount := accountForUserIdResponse{
+			AccountId: matchingAccounts[0].AccountId,
+		}
 		_ = response.WriteAsJson(responseForAccount)
 	} else {
 		_ = response.WriteErrorString(404, "Could not find matching account")
