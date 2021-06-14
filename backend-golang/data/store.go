@@ -1,12 +1,12 @@
 package data
 
 type Store struct {
-	Users         []User         `json:"users"`
-	Accounts      []Account      `json:"accounts"`
-	Payments      []Payment      `json:"payments"`
-	Notifications []Notification `json:"notifications"`
-	Tickets       []Ticket       `json:"tickets"`
-	Sessions      []string       `json:"sessions"`
+	Users         []User          `json:"users"`
+	Accounts      []Account       `json:"accounts"`
+	Payments      []Payment       `json:"payments"`
+	Notifications []Notification  `json:"notifications"`
+	Tickets       []Ticket        `json:"tickets"`
+	Sessions      map[string]User `json:"sessions"`
 }
 
 type UserNotFoundError struct{}
@@ -17,7 +17,7 @@ func (s *Store) Initialise() {
 	s.Payments = dummyPayments()
 	s.Notifications = dummyNotifications()
 	s.Tickets = dummyTickets()
-	s.Sessions = []string{}
+	s.Sessions = make(map[string]User)
 }
 
 func (s *Store) FindUserByName(name string) (User, error) {
@@ -39,15 +39,12 @@ func (s *Store) FindUserByName(name string) (User, error) {
 	return matchingUser, &UserNotFoundError{}
 }
 
-func(s *Store) SessionExists(token string) bool {
+func (s *Store) SessionExists(token string) bool {
 	sessionExists := false
 	sessions := s.Sessions
 
-	for _, session := range sessions {
-		if token == session {
-			sessionExists = true
-			break
-		}
+	if _, ok := sessions[token]; ok {
+		sessionExists = true
 	}
 
 	return sessionExists

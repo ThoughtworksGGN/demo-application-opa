@@ -68,7 +68,7 @@ func (api api) login(req *restful.Request, resp *restful.Response) {
 
 		loginResponseBody := loginResponse{Token: token}
 
-		api.Store.Sessions = append(api.Store.Sessions, token)
+		api.Store.Sessions[token] = user
 		_ = resp.WriteAsJson(loginResponseBody)
 
 	} else {
@@ -79,19 +79,8 @@ func (api api) login(req *restful.Request, resp *restful.Response) {
 
 func (api api) logout(req *restful.Request, resp *restful.Response) {
 	authHeader := req.Request.Header.Get("Authorization")
-	sessionToDelete := -10
-	for index, session := range api.Store.Sessions {
-		if session == authHeader {
-			sessionToDelete = index
-			break
-		}
-	}
 
-	if sessionToDelete >= 0 {
-		sessions := api.Store.Sessions
-		sessions[sessionToDelete] = sessions[len(sessions)-1]
-		api.Store.Sessions = sessions[:len(sessions)-1]
-	}
+	delete(api.Store.Sessions, authHeader)
 
 	resp.WriteHeader(http.StatusOK)
 }
