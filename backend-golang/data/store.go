@@ -1,5 +1,7 @@
 package data
 
+import uuid "github.com/satori/go.uuid"
+
 type Store struct {
 	Users         []User          `json:"users"`
 	Accounts      []Account       `json:"accounts"`
@@ -52,4 +54,16 @@ func (s *Store) SessionExists(token string) bool {
 
 func (e UserNotFoundError) Error() string {
 	return "User Not found"
+}
+
+func(s *Store) FindTicketsByAsignee(assignee uuid.UUID) []Ticket {
+	var tickets []Ticket
+
+	for _, ticket := range s.Tickets {
+		if ticket.Assignee == assignee {
+			tickets = append(tickets, ticket)
+		}
+	}
+
+	return tickets
 }

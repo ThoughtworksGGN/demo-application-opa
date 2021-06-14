@@ -23,6 +23,10 @@ type loginResponse struct {
 	Token string `json:"token"`
 }
 
+type ticketsResponse struct {
+	Tickets *[]data.Ticket `json:"tickets"`
+}
+
 func InitialiseWebService(store *data.Store) http.Handler {
 	ws := new(restful.WebService)
 	api := api{Store: store}
@@ -32,6 +36,8 @@ func InitialiseWebService(store *data.Store) http.Handler {
 	ws.Route(ws.GET("/hello").Filter(api.authFilter()).To(api.hello))
 	ws.Route(ws.POST("/login").To(api.login).Consumes(restful.MIME_JSON).Produces(restful.MIME_JSON))
 	ws.Route(ws.DELETE("/logout").To(api.logout).Consumes(restful.MIME_JSON).Produces(restful.MIME_JSON))
+	ws.Route(ws.GET("/tickets").Filter(api.authFilter()).To(api.getTickets).Consumes(restful.MIME_JSON).Produces(restful.MIME_JSON))
+	ws.Route(ws.GET("/account/"))
 
 	restfulContainer.Add(ws)
 
@@ -92,4 +98,14 @@ func (api api) populateDataStoreInContext() restful.FilterFunction {
 		req.Request = r.WithContext(ctx)
 		chain.ProcessFilter(req, resp)
 	}
+}
+
+func (api api) getTickets(request *restful.Request, response *restful.Response) {
+	token:= request.Request.Header.Get("authorization")
+	user := api.Store.Sessions[token]
+
+	tickets := api.Store.FindTicketsByAsignee(user.UserId)
+	ticketsResponse := ticketsResponse{Tickets: &tickets}
+
+	_ = response.WriteAsJson(ticketsResponse)
 }

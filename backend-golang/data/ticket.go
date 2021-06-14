@@ -3,11 +3,11 @@ package data
 import uuid "github.com/satori/go.uuid"
 
 type Ticket struct {
-	TicketId  uuid.UUID `json:"ticketid"`
-	AccountId uuid.UUID `json:"accountid"`
-	Assignee  uuid.UUID `json:"assignee"`
-	Info      string    `json:"info"`
-	Notes     string    `json:"notes"`
+	TicketId  uuid.UUID `json:"ticketid,omitempty"`
+	AccountId uuid.UUID `json:"accountid,omitempty"`
+	Assignee  uuid.UUID `json:"assignee,omitempty"`
+	Info      string    `json:"info,omitempty"`
+	Notes     string    `json:"notes,omitempty"`
 }
 
 func dummyTickets() []Ticket {
