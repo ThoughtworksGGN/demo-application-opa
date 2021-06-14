@@ -56,7 +56,7 @@ func (e UserNotFoundError) Error() string {
 	return "User Not found"
 }
 
-func(s *Store) FindTicketsByAsignee(assignee uuid.UUID) []Ticket {
+func (s *Store) FindTicketsByAsignee(assignee uuid.UUID) []Ticket {
 	var tickets []Ticket
 
 	for _, ticket := range s.Tickets {
@@ -66,4 +66,40 @@ func(s *Store) FindTicketsByAsignee(assignee uuid.UUID) []Ticket {
 	}
 
 	return tickets
+}
+
+func (s *Store) FindTicketsByAccountId(accountId uuid.UUID)[]Ticket{
+	var tickets []Ticket
+
+	for _, ticket := range s.Tickets {
+		if ticket.AccountId == accountId {
+			tickets = append(tickets, ticket)
+		}
+	}
+
+	return tickets
+}
+
+func (s *Store) FindPaymentsByAccountId(accountId uuid.UUID)[]Payment{
+	var payments []Payment
+
+	for _, payment := range s.Payments {
+		if payment.AccountId == accountId {
+			payments = append(payments, payment)
+		}
+	}
+
+	return payments
+}
+
+func (s *Store) FindNotificationsByAccountId(accountId uuid.UUID)[]Notification{
+	var notifications []Notification
+
+	for _, notification := range s.Notifications {
+		if notification.AccountId == accountId {
+			notifications = append(notifications, notification)
+		}
+	}
+
+	return notifications
 }
