@@ -1,11 +1,10 @@
-import axios, {AxiosRequestConfig, AxiosResponse} from 'axios';
+import axios, {AxiosRequestConfig} from 'axios';
 import {
-    account,
     accountForUserResponse,
     accountResponse,
     loginRequest, loginResponse,
     ticketsResponse,
-    user
+    user, USERTOKEN
 } from "@/components/types";
 import jwtDecode from "jwt-decode";
 
@@ -22,7 +21,7 @@ export const login = async(data: loginRequest):Promise<loginResponse> => {
     const response = await axios.post(url,data,requestConfig);
 
     if (response.data && response.data.token) {
-        localStorage.setItem('demo-app-opa-token', response.data.token);
+        localStorage.setItem(USERTOKEN, response.data.token);
         loginResponse.token = response.data.token;
     }
 
@@ -33,8 +32,8 @@ export const login = async(data: loginRequest):Promise<loginResponse> => {
 
 };
 
-export const getUserDataFromToken = async():Promise<user> => {
-    const token = localStorage.getItem('demo-app-opa-token');
+export const getUserDataFromToken = function() {
+    const token = localStorage.getItem(USERTOKEN);
     const user: user = {
         name: "", role: "", userid: ""
     };
@@ -55,7 +54,7 @@ export const getAccountForUser = async():Promise<accountForUserResponse> => {
         error: ""
     };
     const url = `${baseUrl}/account`;
-    const token = localStorage.getItem('demo-app-opa-token');
+    const token = localStorage.getItem(USERTOKEN);
     requestConfig.headers = { Authorization: token }
     const response = await axios.get(url,requestConfig);
 
@@ -70,7 +69,7 @@ export const getAccountForUser = async():Promise<accountForUserResponse> => {
 
 export const getTickets = async():Promise<ticketsResponse> => {
     const url = `${baseUrl}/tickets`;
-    const token = localStorage.getItem('demo-app-opa-token');
+    const token = localStorage.getItem(USERTOKEN);
     const requestConfig = {} as AxiosRequestConfig;
     const ticketsResponse: ticketsResponse = {
         tickets: [],
@@ -94,7 +93,7 @@ export const getAccount = async(accountId: string):Promise<accountResponse>  => 
     // @ts-ignore
     const accountResponse: accountResponse = {};
     const url = `${baseUrl}/accounts/${accountId}`;
-    const token = localStorage.getItem('demo-app-opa-token');
+    const token = localStorage.getItem(USERTOKEN);
     const requestConfig = {} as AxiosRequestConfig;
     requestConfig.headers = { Authorization: token };
 

@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Vue } from 'vue-property-decorator';
 import {getAccountForUser, getUserDataFromToken, login} from './service'
 import {loginRequest} from "@/components/types";
 
@@ -25,11 +25,13 @@ export default class LoginPage extends Vue{
 
     await login(loginRequest);
 
-    const user = await getUserDataFromToken();
+    const user = getUserDataFromToken();
 
     if (user.role === "CUSTOMER") {
       const accountId = (await getAccountForUser()).account_id;
-      console.log(`MUBARAK HO CUSTOMER HUA HAI ! Account ID: ${accountId}`);
+      await this.$router.push({path: `account/${accountId}`});
+    } else if (user.role === "SUPPORT") {
+      await this.$router.push({path: `tickets`});
     }
   }
 }

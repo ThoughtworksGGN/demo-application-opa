@@ -54,7 +54,9 @@ export interface ticketsResponse {
 }
 
 export interface accountResponse {
-    account: Account,
+    account: account,
     responseCode: number,
     error: string
 }
+
+export const USERTOKEN = 'demo-app-opa-token'
