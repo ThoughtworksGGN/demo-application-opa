@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/emicklei/go-restful/v3"
+	"github.com/rs/cors"
 	uuid "github.com/satori/go.uuid"
 	"io"
 	"net/http"
@@ -54,7 +55,15 @@ func InitialiseWebService(store *data.Store) http.Handler {
 
 	restfulContainer.Add(ws)
 
-	return restfulContainer.ServeMux
+	corsRouter := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedHeaders:   []string{"Authorization", "Content-Type", "Accept"},
+		AllowCredentials: true,
+		Debug:            true,
+		AllowedMethods:   []string{"HEAD", "GET", "POST", "DELETE"},
+	})
+
+	return corsRouter.Handler(restfulContainer.ServeMux)
 }
 
 func (api api) hello(req *restful.Request, resp *restful.Response) {
