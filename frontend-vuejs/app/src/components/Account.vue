@@ -5,7 +5,16 @@
         <v-app-bar-title>
           <span class="text-no-wrap-demo">Account Details</span>
         </v-app-bar-title>
-        <v-btn light absolute right to="/logout">Logout</v-btn>
+        <v-menu offset-y>
+          <template v-slot:activator="{ on,attrs }">
+            <v-btn light absolute right v-bind="attrs" v-on="on">{{ user.name }}</v-btn>
+          </template>
+          <v-list>
+            <v-list-item to="/logout">
+              <v-list-item-title>Logout</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </v-app-bar>
       <v-container fill-height>
         <v-row>
@@ -112,13 +121,16 @@
 <script lang="ts">
 import {Vue} from "vue-property-decorator";
 import Component from "vue-class-component";
-import {account} from "@/components/types";
-import {getAccount} from "@/components/service";
+import {account, user} from "@/components/types";
+import {getAccount, getUserDataFromToken} from "@/components/service";
 
 @Component
 export default class AccountDetails extends Vue{
  account: account | null = null;
+ user: user | null = null ;
   async beforeMount(){
+    this.user = getUserDataFromToken();
+
     const accountId = this.$route.params.accountid;
     const accountForUserResponse = await getAccount(accountId);
     if (accountForUserResponse.responseCode === 403) {
