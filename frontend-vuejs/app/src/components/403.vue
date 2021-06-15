@@ -1,16 +1,16 @@
 <template>
-  <v-app id="logout">
-    <v-main v-if="message">
+  <v-app id="forbidden">
+    <v-main>
       <v-container fill-height>
         <v-row>
           <v-col cols="4" offset="4">
             <v-card class="justify-center">
               <v-card-title class="justify-center">
-                Logged out Successfully!
+                You are not permitted to carry out this action.
               </v-card-title>
               <v-card-actions class="justify-center">
-                <v-btn color="primary" to="/login">
-                  Login Again
+                <v-btn color="primary" to="/">
+                  Home
                 </v-btn>
               </v-card-actions>
             </v-card>
@@ -22,16 +22,10 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import {Component} from "vue-property-decorator";
-import {USERTOKEN} from "@/components/types";
+import {Component, Vue} from "vue-property-decorator";
 
 @Component
-export default class Logout extends Vue{
-  message: string | null = null;
-  beforeMount() {
-    localStorage.removeItem(USERTOKEN);
-    this.message = "Logged Out Successfully!";
-  }
+export default  class Forbidden extends Vue{
+
 }
 </script>

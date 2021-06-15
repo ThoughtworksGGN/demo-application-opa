@@ -1,61 +1,85 @@
 <template>
-  <div id="account-details" v-if="account">
-    <div>
-      <label>Account Id: </label>
-      <span>{{ account.account_id }}</span>
-    </div>
-    <div>
-      <h3>Payments</h3>
-      <table>
-        <thead>
-        <td>Payment Id</td>
-        <td>Amount</td>
-        </thead>
-        <tbody>
-        <template v-for="payment in account.payments">
-          <tr :key="payment.paymentid">
-            <td>{{ payment.paymentid }}</td>
-            <td>{{ payment.amount }}</td>
-          </tr>
-        </template>
-        </tbody>
-      </table>
-    </div>
-    <div>
-      <h3>Notifications</h3>
-      <table>
-        <thead>
-        <td>Notification Id</td>
-        <td>Info</td>
-        </thead>
-        <tbody>
-        <template v-for="notification in account.notifications">
-          <tr :key="notification.notificationid">
-            <td>{{ notification.notificationid }}</td>
-            <td>{{ notification.info }}</td>
-          </tr>
-        </template>
-        </tbody>
-      </table>
-    </div>
-    <div>
-      <h3>Tickets</h3>
-      <table>
-        <thead>
-        <td>Ticket Id</td>
-        <td>Info</td>
-        </thead>
-        <tbody>
-        <template v-for="ticket in account.tickets">
-          <tr :key="ticket.ticketid">
-            <td>{{ ticket.ticketid }}</td>
-            <td>{{ ticket.info }}</td>
-          </tr>
-        </template>
-        </tbody>
-      </table>
-    </div>
-  </div>
+  <v-app id="account-details">
+    <v-main v-if="account">
+      <v-app-bar fixed color="primary" dark class="text-no-wrap">
+        <v-app-bar-title>
+          <span class="text-no-wrap-demo">Account Details</span>
+        </v-app-bar-title>
+        <v-btn light absolute right to="/logout">Logout</v-btn>
+      </v-app-bar>
+      <v-container fill-height>
+        <v-row>
+          <v-card id="payments">
+              <v-toolbar dark color="green">
+                <v-toolbar-title>Payments</v-toolbar-title>
+              </v-toolbar>
+              <v-card-text>
+                <v-simple-table>
+                  <thead>
+                  <tr>
+                    <th>Payment Id</th>
+                    <th>Amount</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr v-for="payment in account.payments" :key="payment.paymentid">
+                    <td>{{payment.paymentid}}</td>
+                    <td>{{payment.amount}}</td>
+                  </tr>
+                  </tbody>
+                </v-simple-table>
+              </v-card-text>
+            </v-card>
+        </v-row>
+        <v-row>
+          <v-card id="tickets">
+              <v-toolbar dark color="red">
+                <v-toolbar-title>Tickets</v-toolbar-title>
+              </v-toolbar>
+              <v-card-text>
+                <v-simple-table>
+                  <thead>
+                  <tr>
+                    <th>Ticket Id</th>
+                    <th>Info</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr v-for="ticket in account.tickets" :key="ticket.ticketid">
+                    <td>{{ticket.ticketid}}</td>
+                    <td>{{ticket.info}}</td>
+                  </tr>
+                  </tbody>
+                </v-simple-table>
+              </v-card-text>
+            </v-card>
+        </v-row>
+        <v-row>
+          <v-card id="notifications">
+              <v-toolbar dark color="orange">
+                <v-toolbar-title>Notifications</v-toolbar-title>
+              </v-toolbar>
+              <v-card-text>
+                <v-simple-table>
+                  <thead>
+                  <tr>
+                    <th>Notification Id</th>
+                    <th>Info</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr v-for="notification in account.notifications" :key="notification.notificationid">
+                    <td>{{notification.notificationid}}</td>
+                    <td>{{notification.info}}</td>
+                  </tr>
+                  </tbody>
+                </v-simple-table>
+              </v-card-text>
+            </v-card>
+        </v-row>
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
 <script lang="ts">
@@ -70,7 +94,17 @@ export default class AccountDetails extends Vue{
   async beforeMount(){
     const accountId = this.$route.params.accountid;
     const accountForUserResponse = await getAccount(accountId);
-    this.account = accountForUserResponse.account;
+    if (accountForUserResponse.responseCode === 403) {
+      await this.$router.push({path:"forbidden"});
+    } else {
+      this.account = accountForUserResponse.account;
+    }
   }
 }
 </script>
+
+<style scoped>
+.text-no-wrap-demo {
+
+}
+</style>

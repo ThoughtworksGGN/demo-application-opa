@@ -1,26 +1,24 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import Home from '../views/Home.vue'
 import AccountDetails from "@/components/Account.vue";
 import LoginPage from "@/components/Login.vue";
 import Logout from "@/components/Logout.vue";
 import {USERTOKEN} from "@/components/types";
 import Tickets from "@/components/Tickets.vue";
+import Home from "@/components/Home.vue";
+import Forbidden from "@/components/403.vue";
 
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
   {
     path: '/',
-    name: 'Home',
+    name: 'home',
     component: Home
   },
   {
     path: '/login',
     name: 'login',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
     component: LoginPage
   },
   {
@@ -37,6 +35,11 @@ const routes: Array<RouteConfig> = [
     path: '/tickets',
     name: 'tickets',
     component: Tickets
+  },
+  {
+    path: '/forbidden',
+    name:'forbidden',
+    component: Forbidden
   }
 ]
 
