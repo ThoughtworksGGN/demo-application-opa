@@ -103,3 +103,22 @@ func (s *Store) FindNotificationsByAccountId(accountId uuid.UUID)[]Notification{
 
 	return notifications
 }
+
+func (s *Store) FindUserByUserId(id uuid.UUID) (User, error) {
+	users := s.Users
+	userFound := false
+	var matchingUser User
+
+	for _, user := range users {
+		if user.UserId == id {
+			matchingUser = user
+			userFound = true
+			break
+		}
+	}
+
+	if userFound {
+		return matchingUser, nil
+	}
+	return matchingUser, &UserNotFoundError{}
+}

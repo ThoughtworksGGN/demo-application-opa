@@ -32,7 +32,8 @@ export interface account {
     account_id: string,
     payments: payment[],
     tickets: ticket[],
-    notifications: notification[]
+    notifications: notification[],
+    user: user
 }
 
 export interface loginResponse {

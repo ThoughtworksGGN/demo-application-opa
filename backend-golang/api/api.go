@@ -34,6 +34,7 @@ type accountResponse struct {
 	Payments      *[]data.Payment      `json:"payments"`
 	Notifications *[]data.Notification `json:"notifications"`
 	Tickets       *[]data.Ticket       `json:"tickets"`
+	User          data.User            `json:"user"`
 }
 
 type accountForUserIdResponse struct {
@@ -150,12 +151,14 @@ func (api api) getAccount(request *restful.Request, response *restful.Response) 
 		payments := api.Store.FindPaymentsByAccountId(account.AccountId)
 		tickets := api.Store.FindTicketsByAccountId(account.AccountId)
 		notifications := api.Store.FindNotificationsByAccountId(account.AccountId)
+		user, _ := api.Store.FindUserByUserId(account.UserId)
 
 		responseForAccount := accountResponse{
 			AccountId:     account.AccountId,
 			Payments:      &payments,
 			Notifications: &notifications,
 			Tickets:       &tickets,
+			User:          user,
 		}
 
 		_ = response.WriteAsJson(responseForAccount)
