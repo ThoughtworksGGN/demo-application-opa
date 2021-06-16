@@ -11,6 +11,12 @@ type Store struct {
 	Sessions      map[string]User `json:"sessions"`
 }
 
+type RegoData struct {
+	Users map[uuid.UUID]User `json:"users"`
+	Accounts map[uuid.UUID]Account `json:"accounts"`
+	Tickets map[uuid.UUID]Ticket `json:"tickets"`
+}
+
 type UserNotFoundError struct{}
 
 func (s *Store) Initialise() {
@@ -121,4 +127,25 @@ func (s *Store) FindUserByUserId(id uuid.UUID) (User, error) {
 		return matchingUser, nil
 	}
 	return matchingUser, &UserNotFoundError{}
+}
+
+func (s *Store) RegoData() RegoData {
+	data := RegoData{
+		Users: make(map[uuid.UUID]User),
+		Accounts: make(map[uuid.UUID]Account),
+		Tickets: make(map[uuid.UUID]Ticket),
+	}
+
+	for _, user := range s.Users {
+		data.Users[user.UserId] = user
+	}
+
+	for _, account := range s.Accounts {
+		data.Accounts[account.AccountId] = account
+	}
+
+	for _, ticket := range s.Tickets {
+		data.Tickets[ticket.TicketId] = ticket
+	}
+	return data
 }

@@ -41,6 +41,11 @@ type accountForUserIdResponse struct {
 	AccountId uuid.UUID `json:"account_id"`
 }
 
+type helloResponse struct {
+	Store data.Store `json:"store"`
+	RegoData data.RegoData `json:"rego_data"`
+}
+
 func InitialiseWebService(store *data.Store) http.Handler {
 	ws := new(restful.WebService)
 	api := api{Store: store}
@@ -50,8 +55,8 @@ func InitialiseWebService(store *data.Store) http.Handler {
 	ws.Route(ws.GET("/hello").Filter(api.authFilter()).To(api.hello))
 	ws.Route(ws.POST("/login").To(api.login).Consumes(restful.MIME_JSON).Produces(restful.MIME_JSON))
 	ws.Route(ws.DELETE("/logout").To(api.logout).Consumes(restful.MIME_JSON).Produces(restful.MIME_JSON))
-	ws.Route(ws.GET("/tickets").Filter(api.authFilter()).To(api.getTickets).Consumes(restful.MIME_JSON).Produces(restful.MIME_JSON))
-	ws.Route(ws.GET("/accounts/{accountId}").Filter(api.authFilter()).To(api.getAccount).Consumes(restful.MIME_JSON).Produces(restful.MIME_JSON))
+	ws.Route(ws.GET("/tickets").Filter(api.authFilter()).Filter(api.supportAuthzFilter()).To(api.getTickets).Consumes(restful.MIME_JSON).Produces(restful.MIME_JSON))
+	ws.Route(ws.GET("/accounts/{accountId}").Filter(api.authFilter()).Filter(api.accountAuthzFilter()).To(api.getAccount).Consumes(restful.MIME_JSON).Produces(restful.MIME_JSON))
 	ws.Route(ws.GET("/account").Filter(api.authFilter()).To(api.getAccountForUser).Consumes(restful.MIME_JSON).Produces(restful.MIME_JSON))
 
 	restfulContainer.Add(ws)
@@ -67,9 +72,13 @@ func InitialiseWebService(store *data.Store) http.Handler {
 	return corsRouter.Handler(restfulContainer.ServeMux)
 }
 
-func (api api) hello(req *restful.Request, resp *restful.Response) {
-	ctx := req.Request.Context()
-	_ = resp.WriteAsJson(ctx.Value("store"))
+func (api api) hello(_ *restful.Request, resp *restful.Response) {
+	var helloResponse helloResponse
+	regoData := api.Store.RegoData()
+	helloResponse.Store = *api.Store
+	helloResponse.RegoData = regoData
+
+	_ = resp.WriteAsJson(helloResponse)
 }
 
 func (api api) login(req *restful.Request, resp *restful.Response) {
@@ -124,10 +133,7 @@ func (api api) populateDataStoreInContext() restful.FilterFunction {
 }
 
 func (api api) getTickets(request *restful.Request, response *restful.Response) {
-	token := request.Request.Header.Get("authorization")
-	user := api.Store.Sessions[token]
-
-	tickets := api.Store.FindTicketsByAsignee(user.UserId)
+	tickets := api.Store.Tickets
 	ticketsResponse := ticketsResponse{Tickets: &tickets}
 
 	_ = response.WriteAsJson(ticketsResponse)
