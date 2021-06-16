@@ -29,6 +29,7 @@
                   <th>Ticket Id</th>
                   <th>Account Id</th>
                   <th>Info</th>
+                  <th>Assigned to me</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -38,6 +39,7 @@
                     <router-link :to="`/account/${ticket.accountid}`">{{ticket.accountid}}</router-link>
                   </td>
                   <td>{{ticket.info}}</td>
+                  <td>{{ticket.assignee == user.userid}}</td>
                 </tr>
                 </tbody>
               </v-simple-table>
