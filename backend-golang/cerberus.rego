@@ -1,6 +1,7 @@
 package api
 
 default viewAccount = false
+default support = false
 
 customer = true {
     user := data.users[input.userid]

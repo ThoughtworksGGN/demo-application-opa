@@ -65,7 +65,7 @@ func InitialiseWebService(store *data.Store) http.Handler {
 		AllowedOrigins:   []string{"*"},
 		AllowedHeaders:   []string{"Authorization", "Content-Type", "Accept"},
 		AllowCredentials: true,
-		Debug:            true,
+		Debug:            false,
 		AllowedMethods:   []string{"HEAD", "GET", "POST", "DELETE"},
 	})
 

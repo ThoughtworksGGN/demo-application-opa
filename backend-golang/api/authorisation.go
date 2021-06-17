@@ -4,15 +4,17 @@ import (
 	"context"
 	"demo-application-opa-golang/data"
 	"encoding/json"
+	"fmt"
 	"github.com/emicklei/go-restful/v3"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/storage/inmem"
+	"io/ioutil"
 )
 
 func isActionAllowed(input map[string]interface{}, queryText string, store *data.Store) bool {
 	ctx := context.Background()
 	var regoData map[string]interface{}
-	regoDataAsJsonString,_ := json.Marshal(store.RegoData())
+	regoDataAsJsonString, _ := json.Marshal(store.RegoData())
 
 	json.Unmarshal(regoDataAsJsonString, &regoData)
 
@@ -20,7 +22,7 @@ func isActionAllowed(input map[string]interface{}, queryText string, store *data
 	regoModule := regoModule()
 	queryString := "data.api." + queryText
 
-	query, _ := rego.New(rego.Query(queryString), rego.Store(regoStore), rego.Module("cerberus.rego",regoModule)).PrepareForEval(ctx)
+	query, _ := rego.New(rego.Query(queryString), rego.Store(regoStore), rego.Module("cerberus.rego", regoModule)).PrepareForEval(ctx)
 
 	results, err := query.Eval(ctx, rego.EvalInput(input))
 	if err != nil {
@@ -44,8 +46,9 @@ func (api api) accountAuthzFilter() restful.FilterFunction {
 
 		if !isActionAllowed(input, query, api.Store) {
 			_ = response.WriteErrorString(403, "Access Denied")
+		} else {
+			chain.ProcessFilter(request, response)
 		}
-		chain.ProcessFilter(request,response)
 	}
 }
 
@@ -60,44 +63,23 @@ func (api api) supportAuthzFilter() restful.FilterFunction {
 
 		if !isActionAllowed(input, query, api.Store) {
 			_ = response.WriteErrorString(403, "Access Denied")
+		} else {
+			chain.ProcessFilter(request, response)
 		}
-		chain.ProcessFilter(request,response)
 	}
 }
 
 func regoModule() string {
-	module := `
-package api
+	module := ""
+	regoFile := "cerberus.rego"
 
-default viewAccount = false
-default support = false
+	fileBytes, err := ioutil.ReadFile(regoFile)
 
-customer = true {
-    user := data.users[input.userid]
-    user.role == "CUSTOMER"
+	if err != nil {
+		fmt.Println("Couldnot read rego file")
+	}
+
+	module = string(fileBytes)
+
+	return module
 }
-
-support  = true {
-    user := data.users[input.userid]
-    user.role == "SUPPORT"
-}
-
-accountOwner = true {
-  userid := input.userid
-  accountid := input.accountid
-  customer
-  data.accounts[accountid].userid == userid
-}
-
-viewAccount = true {
-	accountOwner
-} else = true {
-  data.tickets[idx].accountid = input.accountid
-  data.tickets[idx].assignee == input.userid
-}
-`
-return module
-}
-
-
-
